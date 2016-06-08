@@ -147,8 +147,7 @@ class Downloader
 
 	private function is_youtubedl_installed()
 	{
-		exec("which youtube-dl", $out, $r);
-		return $r;
+		return 0;
 	}
 
 	private function is_extracter_installed()
@@ -184,7 +183,7 @@ class Downloader
 
 	private function do_download()
 	{
-		$cmd = "youtube-dl";
+		$cmd = "/opt/bin/python /opt/bin/youtube-dl";
 		$cmd .= " -o ".$this->download_path."/";
 		$cmd .= escapeshellarg("%(title)s-%(uploader)s.%(ext)s");
 
@@ -199,9 +198,12 @@ class Downloader
 		}
 
 		$cmd .= " --restrict-filenames"; // --restrict-filenames is for specials chars
-		$cmd .= " > /dev/null & echo $!";
 
-		shell_exec($cmd);
+		$log = $this->download_path . "/tail";
+
+		$pidfile = exec(sprintf("%s > %s 2>&1 & echo $!", $cmd, $log));
+
+		$this->errors[] = $pidfile;
 	}
 }
 
